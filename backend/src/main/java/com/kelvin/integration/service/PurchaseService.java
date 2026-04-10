@@ -12,18 +12,32 @@ public class PurchaseService {
     private RestTemplate restTemplate;
 
     public void sendToPartner(Purchase purchase) {
-
         String url = "https://jsonplaceholder.typicode.com/posts";
 
-        try {
-            Object response = restTemplate.postForObject(url, purchase, Object.class);
+        int maxAttempts = 3;
+        int attempt = 0;
+        boolean success = false;
 
-            System.out.println("Integração realizada com sucesso!");
-            System.out.println(response);
+        while (attempt < maxAttempts && !success) {
+            attempt++;
 
-        } catch (Exception e) {
-            System.out.println("Erro ao integrar com parceiro: " + e.getMessage());
-            throw new RuntimeException("Falha na integração");
+            try {
+                System.out.println("Tentativa " + attempt + " de envio para parceiro...");
+
+                Object response = restTemplate.postForObject(url, purchase, Object.class);
+
+                System.out.println("Integração realizada com sucesso na tentativa " + attempt);
+                System.out.println(response);
+
+                success = true;
+
+            } catch (Exception e) {
+                System.out.println("Erro na tentativa " + attempt + ": " + e.getMessage());
+
+                if (attempt == maxAttempts) {
+                    throw new RuntimeException("Falha na integração após " + maxAttempts + " tentativas");
+                }
+            }
         }
     }
 }
