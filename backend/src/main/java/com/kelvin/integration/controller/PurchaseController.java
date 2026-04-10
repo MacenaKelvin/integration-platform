@@ -1,5 +1,6 @@
 package com.kelvin.integration.controller;
 
+import com.kelvin.integration.dto.PurchaseResponseDTO;
 import com.kelvin.integration.model.IntegrationStatus;
 import com.kelvin.integration.model.Purchase;
 import com.kelvin.integration.repository.PurchaseRepository;
@@ -23,7 +24,7 @@ public class PurchaseController {
     private PurchaseService purchaseService;
 
     @PostMapping
-    public Purchase create(@RequestBody Purchase purchase) {
+    public PurchaseResponseDTO create(@RequestBody Purchase purchase) {
 
         if (purchase.getDate() == null) {
             purchase.setDate(LocalDateTime.now());
@@ -48,23 +49,30 @@ public class PurchaseController {
             log.error("Erro ao integrar compra | purchaseId={} | erro={}", saved.getPurchaseId(), e.getMessage());
         }
 
-        return repository.save(saved);
+        Purchase updated = repository.save(saved);
+        return toResponseDTO(updated);
     }
 
     @GetMapping
-    public List<Purchase> findAll() {
+    public List<PurchaseResponseDTO> findAll() {
         log.info("Listando todas as compras");
-        return repository.findAll();
+        return repository.findAll()
+            .stream()
+            .map(this::toResponseDTO)
+            .toList();
     }
 
     @GetMapping("/status/{status}")
-    public List<Purchase> findByStatus(@PathVariable IntegrationStatus status) {
+    public List<PurchaseResponseDTO> findByStatus(@PathVariable IntegrationStatus status) {
         log.info("Buscando compras por status {}", status);
-        return repository.findByStatus(status);
+        return repository.findByStatus(status)
+            .stream()
+            .map(this::toResponseDTO)
+            .toList();
     }
 
     @PostMapping("/{id}/reprocess")
-    public Purchase reprocess(@PathVariable Long id) {
+    public PurchaseResponseDTO reprocess(@PathVariable Long id) {
         Purchase purchase = repository.findById(id)
             .orElseThrow(() -> new RuntimeException("Compra não encontrada"));
 
@@ -85,6 +93,19 @@ public class PurchaseController {
             log.error("Falha no reprocessamento | purchaseId={} | erro={}", purchase.getPurchaseId(), e.getMessage());
         }
 
-        return repository.save(purchase);
+        Purchase updated = repository.save(purchase);
+        return toResponseDTO(updated);
+    }
+
+    private PurchaseResponseDTO toResponseDTO(Purchase purchase) {
+        return new PurchaseResponseDTO(
+            purchase.getId(),
+            purchase.getPurchaseId(),
+            purchase.getCustomerId(),
+            purchase.getTotalAmount(),
+            purchase.getDate(),
+            purchase.getStatus(),
+            purchase.getAttempts()
+        );
     }
 }
