@@ -13,13 +13,12 @@ public class Purchase {
     private String purchaseId;
     private String customerId;
     private Double totalAmount;
-
     private LocalDateTime date;
 
     @Enumerated(EnumType.STRING)
     private IntegrationStatus status;
 
-    // GETTERS E SETTERS
+    private Integer attempts;
 
     public Long getId() {
         return id;
@@ -63,5 +62,13 @@ public class Purchase {
 
     public void setStatus(IntegrationStatus status) {
         this.status = status;
+    }
+
+    public Integer getAttempts() {
+        return attempts;
+    }
+
+    public void setAttempts(Integer attempts) {
+        this.attempts = attempts;
     }
 }

@@ -30,19 +30,22 @@ public class PurchaseController {
         }
 
         purchase.setStatus(IntegrationStatus.PENDING);
+        purchase.setAttempts(0);
 
         Purchase saved = repository.save(purchase);
 
         log.info("Compra criada com status PENDING | purchaseId={}", saved.getPurchaseId());
 
         try {
-            purchaseService.sendToPartner(saved);
+            int attemptsUsed = purchaseService.sendToPartner(saved);
+            saved.setAttempts(attemptsUsed);
             saved.setStatus(IntegrationStatus.SUCCESS);
             log.info("Compra atualizada para SUCCESS | purchaseId={}", saved.getPurchaseId());
 
         } catch (Exception e) {
-            log.error("Erro ao integrar compra | purchaseId={} | erro={}", saved.getPurchaseId(), e.getMessage());
+            saved.setAttempts(3);
             saved.setStatus(IntegrationStatus.ERROR);
+            log.error("Erro ao integrar compra | purchaseId={} | erro={}", saved.getPurchaseId(), e.getMessage());
         }
 
         return repository.save(saved);
@@ -58,5 +61,30 @@ public class PurchaseController {
     public List<Purchase> findByStatus(@PathVariable IntegrationStatus status) {
         log.info("Buscando compras por status {}", status);
         return repository.findByStatus(status);
+    }
+
+    @PostMapping("/{id}/reprocess")
+    public Purchase reprocess(@PathVariable Long id) {
+        Purchase purchase = repository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Compra não encontrada"));
+
+        log.info("Reprocessando compra | id={} | purchaseId={}", purchase.getId(), purchase.getPurchaseId());
+
+        purchase.setStatus(IntegrationStatus.PENDING);
+        repository.save(purchase);
+
+        try {
+            int attemptsUsed = purchaseService.sendToPartner(purchase);
+            purchase.setAttempts(attemptsUsed);
+            purchase.setStatus(IntegrationStatus.SUCCESS);
+            log.info("Reprocessamento concluído com sucesso | purchaseId={}", purchase.getPurchaseId());
+
+        } catch (Exception e) {
+            purchase.setAttempts(3);
+            purchase.setStatus(IntegrationStatus.ERROR);
+            log.error("Falha no reprocessamento | purchaseId={} | erro={}", purchase.getPurchaseId(), e.getMessage());
+        }
+
+        return repository.save(purchase);
     }
 }

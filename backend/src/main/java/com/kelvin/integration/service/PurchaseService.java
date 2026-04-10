@@ -13,7 +13,7 @@ public class PurchaseService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public void sendToPartner(Purchase purchase) {
+    public int sendToPartner(Purchase purchase) {
 
         if (purchase.getPurchaseId() != null && purchase.getPurchaseId().startsWith("FAIL")) {
             throw new RuntimeException("Erro simulado de integração");
@@ -63,5 +63,7 @@ public class PurchaseService {
                 }
             }
         }
+
+        return attempt;
     }
 }
