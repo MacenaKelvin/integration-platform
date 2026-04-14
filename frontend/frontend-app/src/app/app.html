@@ -1,31 +1,38 @@
-<div class="dashboard-page">
-  <div class="container py-5">
-    <div class="hero-card mb-4">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div>
-          <p class="section-label mb-2">Operations Center</p>
-          <h1 class="dashboard-title mb-2">Integration Dashboard</h1>
-          <p class="dashboard-subtitle mb-0">
-            Monitoramento de integrações, tentativas e reprocessamento de compras.
+<div class="dashboard-shell">
+  <div class="container py-4 py-md-5">
+    <section class="hero-panel mb-4">
+      <div class="hero-content">
+        <div class="hero-copy">
+          <p class="eyebrow mb-2">Integration Control Center</p>
+          <h1 class="hero-title mb-2">Operations Dashboard</h1>
+          <p class="hero-subtitle mb-0">
+            Monitore integrações, acompanhe falhas e reprocessamentos em uma interface objetiva e elegante.
           </p>
         </div>
 
-        <button class="btn btn-gradient px-4 py-2" (click)="toggleForm()">
+        <button class="btn btn-accent px-4 py-3" (click)="toggleForm()">
           <i class="bi bi-plus-circle me-2"></i>
           {{ showForm ? 'Fechar formulário' : 'Nova Compra' }}
         </button>
       </div>
-    </div>
+    </section>
 
-    <div class="form-card mb-4" *ngIf="showForm">
+    <section class="glass-form mb-4" *ngIf="showForm">
+      <div class="section-header mb-4">
+        <h4 class="section-title mb-1">Criar nova compra</h4>
+        <p class="section-description mb-0">
+          Envie uma nova compra para o fluxo de integração.
+        </p>
+      </div>
+
       <div class="row g-3">
         <div class="col-md-4">
           <label class="form-label">Purchase ID</label>
           <input
             type="text"
-            class="form-control custom-input"
+            class="form-control premium-input"
             [(ngModel)]="form.purchaseId"
-            placeholder="Ex: OK-003 ou FAIL-003"
+            placeholder="Ex: OK-005 ou FAIL-005"
           />
         </div>
 
@@ -33,9 +40,9 @@
           <label class="form-label">Cliente</label>
           <input
             type="text"
-            class="form-control custom-input"
+            class="form-control premium-input"
             [(ngModel)]="form.customerId"
-            placeholder="Ex: CLIENTE04"
+            placeholder="Ex: CLIENTE05"
           />
         </div>
 
@@ -43,7 +50,7 @@
           <label class="form-label">Valor</label>
           <input
             type="number"
-            class="form-control custom-input"
+            class="form-control premium-input"
             [(ngModel)]="form.totalAmount"
             placeholder="Ex: 150"
           />
@@ -51,7 +58,7 @@
 
         <div class="col-12 d-flex justify-content-end">
           <button
-            class="btn btn-gradient px-4"
+            class="btn btn-accent px-4 py-3"
             [disabled]="isSubmitting"
             (click)="createPurchase()"
           >
@@ -60,58 +67,52 @@
           </button>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="row g-4 mb-4">
-      <div class="col-md-4">
-        <div class="metric-card">
-          <div class="metric-icon bg-soft-primary">
-            <i class="bi bi-bag-check"></i>
-          </div>
-          <div>
-            <p class="metric-label mb-1">Total de Compras</p>
-            <h3 class="metric-value mb-0">{{ purchases.length }}</h3>
-          </div>
+    <section class="metrics-grid mb-4">
+      <article class="metric-card">
+        <div class="metric-icon metric-purple">
+          <i class="bi bi-stack"></i>
         </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="metric-card">
-          <div class="metric-icon bg-soft-success">
-            <i class="bi bi-check-circle"></i>
-          </div>
-          <div>
-            <p class="metric-label mb-1">Sucesso</p>
-            <h3 class="metric-value mb-0">{{ successCount }}</h3>
-          </div>
+        <div class="metric-copy">
+          <p class="metric-label mb-1">Total de Compras</p>
+          <h3 class="metric-value mb-0">{{ purchases.length }}</h3>
         </div>
-      </div>
+      </article>
 
-      <div class="col-md-4">
-        <div class="metric-card">
-          <div class="metric-icon bg-soft-danger">
-            <i class="bi bi-exclamation-octagon"></i>
-          </div>
-          <div>
-            <p class="metric-label mb-1">Falhas</p>
-            <h3 class="metric-value mb-0">{{ errorCount }}</h3>
-          </div>
+      <article class="metric-card">
+        <div class="metric-icon metric-green">
+          <i class="bi bi-check2-circle"></i>
         </div>
-      </div>
-    </div>
+        <div class="metric-copy">
+          <p class="metric-label mb-1">Sucesso</p>
+          <h3 class="metric-value mb-0">{{ successCount }}</h3>
+        </div>
+      </article>
 
-    <div class="table-card">
-      <div class="table-card-header d-flex justify-content-between align-items-center">
+      <article class="metric-card">
+        <div class="metric-icon metric-gold">
+          <i class="bi bi-exclamation-diamond"></i>
+        </div>
+        <div class="metric-copy">
+          <p class="metric-label mb-1">Falhas</p>
+          <h3 class="metric-value mb-0">{{ errorCount }}</h3>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-panel">
+      <div class="table-panel-header">
         <div>
-          <h5 class="mb-1">Compras processadas</h5>
-          <p class="table-card-subtitle mb-0">
-            Acompanhe o status das integrações em tempo real.
+          <h4 class="section-title mb-1">Compras processadas</h4>
+          <p class="section-description mb-0">
+            Visão operacional das integrações e tentativas executadas.
           </p>
         </div>
       </div>
 
       <div class="table-responsive">
-        <table class="table custom-table align-middle mb-0">
+        <table class="table premium-table align-middle mb-0">
           <thead>
             <tr>
               <th>Purchase ID</th>
@@ -123,15 +124,15 @@
               <th class="text-end">Ações</th>
             </tr>
           </thead>
+
           <tbody>
             <tr *ngFor="let purchase of purchases">
-              <td class="fw-semibold">{{ purchase.purchaseId }}</td>
+              <td class="fw-semibold text-white">{{ purchase.purchaseId }}</td>
               <td>{{ purchase.customerId }}</td>
               <td>R$ {{ purchase.totalAmount }}</td>
-
               <td>
                 <span
-                  class="status-badge"
+                  class="status-pill"
                   [ngClass]="{
                     'status-success': purchase.status === 'SUCCESS',
                     'status-error': purchase.status === 'ERROR',
@@ -141,35 +142,33 @@
                   {{ purchase.status }}
                 </span>
               </td>
-
               <td>{{ purchase.attempts }}</td>
               <td>{{ purchase.date | date:'dd/MM/yyyy HH:mm' }}</td>
-
               <td class="text-end">
                 <button
                   *ngIf="purchase.status === 'ERROR'"
-                  class="btn btn-sm btn-reprocess"
+                  class="btn btn-retry"
                   (click)="reprocess(purchase.id)"
                 >
-                  <i class="bi bi-arrow-repeat me-1"></i>
+                  <i class="bi bi-arrow-repeat me-2"></i>
                   Reprocessar
                 </button>
               </td>
             </tr>
 
             <tr *ngIf="purchases.length === 0">
-              <td colspan="7" class="text-center py-5 text-muted">
+              <td colspan="7" class="text-center py-5 empty-state">
                 Nenhuma compra encontrada.
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
   </div>
 </div>
 
-<app-toast 
+<app-toast
   [message]="toastMessage"
   [type]="toastType"
   [visible]="toastVisible">
