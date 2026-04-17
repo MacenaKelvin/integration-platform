@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { Purchase, PurchaseService } from './services/purchase.service';
 import { ToastComponent } from './components/toast.component';
 
@@ -45,13 +46,13 @@ export class App implements OnInit {
 
     setTimeout(() => {
       this.toastVisible = false;
+      this.cdr.detectChanges();
     }, 3000);
   }
 
   loadData(): void {
     this.purchaseService.getAll().subscribe({
       next: (data) => {
-        console.log('Lista recebida:', data);
         this.purchases = [...data];
         this.cdr.detectChanges();
       },
@@ -61,8 +62,22 @@ export class App implements OnInit {
     });
   }
 
-  toggleForm(): void {
-    this.showForm = !this.showForm;
+  openForm(): void {
+    this.showForm = true;
+    this.cdr.detectChanges();
+  }
+
+  closeForm(): void {
+    this.showForm = false;
+    this.cdr.detectChanges();
+  }
+
+  resetForm(): void {
+    this.form = {
+      purchaseId: '',
+      customerId: '',
+      totalAmount: 0
+    };
   }
 
   createPurchase(): void {
@@ -72,30 +87,33 @@ export class App implements OnInit {
     }
 
     this.isSubmitting = true;
+    this.cdr.detectChanges();
 
-    this.purchaseService.create(this.form).subscribe({
-      next: (response) => {
-        this.purchases = [response, ...this.purchases];
-        this.cdr.detectChanges();
+    this.purchaseService.create(this.form)
+      .pipe(
+        finalize(() => {
+          this.isSubmitting = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.purchases = [response, ...this.purchases];
+          this.resetForm();
 
-        this.showToast('Compra criada com sucesso!', 'success');
+          this.showForm = false;
+          this.showToast('Compra criada com sucesso!', 'success');
 
-        this.form = {
-          purchaseId: '',
-          customerId: '',
-          totalAmount: 0
-        };
+          this.loadData();
 
-        this.showForm = false;
-      },
-      error: () => {
-        this.showToast('Erro ao criar compra', 'error');
-      },
-      complete: () => {
-        this.isSubmitting = false;
-        this.loadData();
-      }
-    });
+          setTimeout(() => {
+            this.cdr.detectChanges();
+          }, 0);
+        },
+        error: () => {
+          this.showToast('Erro ao criar compra', 'error');
+        }
+      });
   }
 
   reprocess(id: number): void {

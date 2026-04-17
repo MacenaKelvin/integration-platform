@@ -1,74 +1,25 @@
 <div class="dashboard-shell">
   <div class="container py-4 py-md-5">
+
+    <!-- HERO -->
     <section class="hero-panel mb-4">
       <div class="hero-content">
         <div class="hero-copy">
           <p class="eyebrow mb-2">Integration Control Center</p>
-          <h1 class="hero-title mb-2">Operations Dashboard</h1>
+          <h1 class="hero-title mb-3">Operations Dashboard</h1>
           <p class="hero-subtitle mb-0">
             Monitore integrações, acompanhe falhas e reprocessamentos em uma interface objetiva e elegante.
           </p>
         </div>
 
-        <button class="btn btn-accent px-4 py-3" (click)="toggleForm()">
+        <button class="btn btn-accent px-4 py-3" (click)="openForm()">
           <i class="bi bi-plus-circle me-2"></i>
-          {{ showForm ? 'Fechar formulário' : 'Nova Compra' }}
+          Nova Compra
         </button>
       </div>
     </section>
 
-    <section class="glass-form mb-4" *ngIf="showForm">
-      <div class="section-header mb-4">
-        <h4 class="section-title mb-1">Criar nova compra</h4>
-        <p class="section-description mb-0">
-          Envie uma nova compra para o fluxo de integração.
-        </p>
-      </div>
-
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">Purchase ID</label>
-          <input
-            type="text"
-            class="form-control premium-input"
-            [(ngModel)]="form.purchaseId"
-            placeholder="Ex: OK-005 ou FAIL-005"
-          />
-        </div>
-
-        <div class="col-md-4">
-          <label class="form-label">Cliente</label>
-          <input
-            type="text"
-            class="form-control premium-input"
-            [(ngModel)]="form.customerId"
-            placeholder="Ex: CLIENTE05"
-          />
-        </div>
-
-        <div class="col-md-4">
-          <label class="form-label">Valor</label>
-          <input
-            type="number"
-            class="form-control premium-input"
-            [(ngModel)]="form.totalAmount"
-            placeholder="Ex: 150"
-          />
-        </div>
-
-        <div class="col-12 d-flex justify-content-end">
-          <button
-            class="btn btn-accent px-4 py-3"
-            [disabled]="isSubmitting"
-            (click)="createPurchase()"
-          >
-            <i class="bi bi-send me-2"></i>
-            {{ isSubmitting ? 'Enviando...' : 'Criar compra' }}
-          </button>
-        </div>
-      </div>
-    </section>
-
+    <!-- MÉTRICAS -->
     <section class="metrics-grid mb-4">
       <article class="metric-card">
         <div class="metric-icon metric-purple">
@@ -101,10 +52,11 @@
       </article>
     </section>
 
+    <!-- TABELA -->
     <section class="table-panel">
       <div class="table-panel-header">
         <div>
-          <h4 class="section-title mb-1">Compras processadas</h4>
+          <h4 class="section-title mb-2">Compras processadas</h4>
           <p class="section-description mb-0">
             Visão operacional das integrações e tentativas executadas.
           </p>
@@ -130,6 +82,7 @@
               <td class="fw-semibold text-white">{{ purchase.purchaseId }}</td>
               <td>{{ purchase.customerId }}</td>
               <td>R$ {{ purchase.totalAmount }}</td>
+
               <td>
                 <span
                   class="status-pill"
@@ -142,8 +95,10 @@
                   {{ purchase.status }}
                 </span>
               </td>
+
               <td>{{ purchase.attempts }}</td>
               <td>{{ purchase.date | date:'dd/MM/yyyy HH:mm' }}</td>
+
               <td class="text-end">
                 <button
                   *ngIf="purchase.status === 'ERROR'"
@@ -166,8 +121,100 @@
       </div>
     </section>
   </div>
+
+  <!-- BACKDROP -->
+  <div
+    class="modal-backdrop-custom"
+    *ngIf="showForm"
+    (click)="closeForm()"
+  ></div>
+
+  <!-- MODAL -->
+  <div class="purchase-modal-wrapper" *ngIf="showForm">
+    <div class="purchase-modal" (click)="$event.stopPropagation()">
+
+      <!-- HEADER -->
+      <div class="purchase-modal-header">
+        <div>
+          <p class="modal-eyebrow mb-2">Nova integração</p>
+          <h4 class="modal-title mb-1">Criar nova compra</h4>
+          <p class="modal-description mb-0">
+            Envie uma nova compra para o fluxo de integração.
+          </p>
+        </div>
+
+        <!-- BOTÃO FECHAR -->
+        <button
+          type="button"
+          class="btn-close-custom"
+          (click)="closeForm()"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- FORM -->
+      <div class="row g-4">
+
+        <div class="col-md-4">
+          <div class="field-group">
+            <label class="form-label">Purchase ID</label>
+            <input
+              type="text"
+              class="form-control premium-input"
+              [(ngModel)]="form.purchaseId"
+              placeholder="Ex: OK-005 ou FAIL-005"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="field-group">
+            <label class="form-label">Cliente</label>
+            <input
+              type="text"
+              class="form-control premium-input"
+              [(ngModel)]="form.customerId"
+              placeholder="Ex: CLIENTE05"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="field-group">
+            <label class="form-label">Valor</label>
+            <input
+              type="number"
+              class="form-control premium-input"
+              [(ngModel)]="form.totalAmount"
+              placeholder="Ex: 150"
+            />
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="purchase-modal-footer">
+        <button class="btn btn-ghost px-4 py-3" (click)="closeForm()">
+          Cancelar
+        </button>
+
+        <button
+          class="btn btn-accent px-4 py-3"
+          [disabled]="isSubmitting"
+          (click)="createPurchase()"
+        >
+          <i class="bi bi-send me-2"></i>
+          {{ isSubmitting ? 'Enviando...' : 'Criar compra' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
 </div>
 
+<!-- TOAST -->
 <app-toast
   [message]="toastMessage"
   [type]="toastType"
